@@ -26,7 +26,7 @@ daily_rain_route(app)
 yearly_rain_route(app)
 
 @app.route('/hourly_rain', methods=['GET'])
-def get_relative_pressure():
+def get_hourly_rain():
     # Replace these variables with your actual InfluxDB connection details and measurement specifics
     url = INFLUXDB_URL
     token = INFLUXDB_TOKEN
