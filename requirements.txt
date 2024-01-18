@@ -1,0 +1,5 @@
+pytz
+Flask
+influxdb-client
+gunicorn
+Flask-Cors
