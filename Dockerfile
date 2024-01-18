@@ -21,8 +21,9 @@ EXPOSE 5000
 # Copy approutes folder into the container
 COPY approutes /app/approutes
 
-# Run Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+# Run Gunicorn with 4 workers
+CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5000", "main:app"]
+
 
 
 
