@@ -1,3 +1,5 @@
+"""Read data from InfluxDB"""
+
 import pytz
 from influxdb_client import InfluxDBClient
 
