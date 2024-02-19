@@ -27,8 +27,7 @@ def relative_pressure_route(app):
             return jsonify({'error': 'Please provide start_time and end_time parameters in the URL'})
 
         # Fetch data for temperature within the specified time range
-        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, start_time,
-                                               end_time)
+        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, start_time, end_time)
 
         # Convert datetime objects to ISO 8601 format
         time_values_iso = [time.isoformat() for time in time_values]
