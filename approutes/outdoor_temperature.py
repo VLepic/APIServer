@@ -1,3 +1,5 @@
+"""Route for retrieving outdoor temperature data from InfluxDB"""
+
 import os
 
 from flask import jsonify, request
@@ -9,11 +11,9 @@ def outdoor_temperature_route(app):
 
     @app.route('/outdoor_temperature', methods=['GET'])
     def get_outdoor_temperature():
+        # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
         INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
-        # InfluxDB connection details and measurement specifics
-        url = INFLUXDB_URL
-        token = INFLUXDB_TOKEN
         org = "HA"
         bucket = "home_assistant"
         entity_id_temperature = "gw1100a_v2_2_3_outdoor_temperature"
@@ -28,7 +28,7 @@ def outdoor_temperature_route(app):
             return jsonify({'error': 'Please provide start_time and end_time parameters in the URL'})
 
         # Fetch data for temperature within the specified time range
-        time_values, measurement_values = read(url, token, org, bucket, entity_id_temperature, field, start_time,
+        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, start_time,
                                                end_time)
 
         # Convert datetime objects to ISO 8601 format
