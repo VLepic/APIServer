@@ -20,13 +20,9 @@ def all_weather_route(app):
 
         if not start_time or not end_time:
             return jsonify({'error': 'Please provide start_time and end_time parameters in the URL'})
+        
+        entity_ids = ["gw1100a_v2_1_3_absolute_pressure", "gw1100a_v2_1_3_daily_rain_rate", "gw1100a_v2_1_3_dewpoint", "gw1100a_v2_1_3_hourly_rain_rate", "gw1100a_v2_1_3_outdoor_temperature", "gw1100a_v2_1_3_relative_pressure", "gw1100a_v2_1_3_wind_gust", "gw1100a_v2_1_3_wind_speed", "gw1100a_v2_1_3_yearly_rain"]
 
-        # Read entity IDs from the text file
-        try:
-            with open('entities.txt', 'r') as file:
-                entity_ids = [line.strip() for line in file.readlines() if line.strip()]
-        except FileNotFoundError:
-            return jsonify({'error': 'Entity ID file not found.'})
 
         results = []
         for entity_id in entity_ids:
