@@ -27,12 +27,17 @@ def read_weather_data(entity_id, start_time, end_time):
 def all_weather_route(app):
     @app.route('/all_weather_data', methods=['GET'])
     def get_all_weather_data():
-        entity_ids = ["gw1100a_v2_1_3_absolute_pressure", "gw1100a_v2_1_3_daily_rain_rate", "gw1100a_v2_1_3_dewpoint",
-                      "gw1100a_v2_1_3_hourly_rain_rate", "gw1100a_v2_1_3_outdoor_temperature",
-                      "gw1100a_v2_1_3_relative_pressure", "gw1100a_v2_1_3_wind_gust", "gw1100a_v2_1_3_wind_speed",
+        entity_ids = ["gw1100a_v2_1_3_absolute_pressure",
+                      "gw1100a_v2_1_3_daily_rain_rate",
+                      "gw1100a_v2_1_3_dewpoint",
+                      "gw1100a_v2_1_3_hourly_rain_rate",
+                      "gw1100a_v2_1_3_outdoor_temperature",
+                      "gw1100a_v2_1_3_relative_pressure",
+                      "gw1100a_v2_1_3_wind_gust",
+                      "gw1100a_v2_1_3_wind_speed",
                       "gw1100a_v2_1_3_yearly_rain"]
 
-        num_processes = 3
+        num_processes = len(entity_ids)
 
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
