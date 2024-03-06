@@ -7,14 +7,12 @@ from joblib import Parallel, delayed
 from Read import read
 
 
-def read_weather_data(entity_id):
+def read_weather_data(entity_id, start_time, end_time):
     INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
     INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
     org = "HA"
     bucket = "home_assistant"
     field = "value"
-    start_time = request.args.get('start_time')
-    end_time = request.args.get('end_time')
 
     if not start_time or not end_time:
         return {'error': 'Please provide start_time and end_time parameters in the URL'}
@@ -36,7 +34,10 @@ def all_weather_route(app):
 
         num_processes = 3
 
-        results = Parallel(n_jobs=num_processes)(delayed(read_weather_data)(entity_id) for entity_id in entity_ids)
+        start_time = request.args.get('start_time')
+        end_time = request.args.get('end_time')
+
+        results = Parallel(n_jobs=num_processes)(delayed(read_weather_data)(entity_id, start_time, end_time) for entity_id in entity_ids)
 
         grouped_results = {}
         for entity_id, result in zip(entity_ids, results):
