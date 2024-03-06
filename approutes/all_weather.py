@@ -1,8 +1,8 @@
 """Route for all weather data"""
 import os
-from multiprocessing import Pool
 
 from flask import jsonify, request
+from joblib import Parallel, delayed
 
 from Read import read
 
@@ -34,14 +34,13 @@ def all_weather_route(app):
                       "gw1100a_v2_1_3_relative_pressure", "gw1100a_v2_1_3_wind_gust", "gw1100a_v2_1_3_wind_speed",
                       "gw1100a_v2_1_3_yearly_rain"]
 
-
         num_processes = 3
 
-        with Pool(processes=num_processes) as pool:
-            results = pool.map(read_weather_data, entity_ids)
+        results = Parallel(n_jobs=num_processes)(delayed(read_weather_data)(entity_id) for entity_id in entity_ids)
 
         grouped_results = {}
         for entity_id, result in zip(entity_ids, results):
             grouped_results[entity_id] = result
 
         return jsonify(grouped_results)
+
