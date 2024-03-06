@@ -3,22 +3,23 @@ name: Tag Release
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   tag_release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Read version from file
         id: version
-        run: echo "::set-output name=version::$(cat version.txt)"
+        run: echo "${{ github.event.client_payload.version }}" > version.txt
 
       - name: Create tag
         run: git tag ${{ steps.version.outputs.version }}
 
       - name: Push tag
         run: git push origin ${{ steps.version.outputs.version }}
+
