@@ -37,7 +37,7 @@ def all_weather_route(app):
                       "gw1100a_v2_2_3_wind_speed",
                       "gw1100a_v2_2_3_hourly_rain_rate",
                       "gw1100a_v2_2_3_daily_rain_rate",
-                      "gw1100a_v2_2_3_yearly_rain"]
+                      "gw1100a_v2_2_3_yearly_rain_rate"]
 
         num_processes = len(entity_ids)
 
