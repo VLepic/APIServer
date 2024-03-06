@@ -8,6 +8,7 @@ from approutes.all_weather import all_weather_route
 from approutes.daily_rain import daily_rain_route
 from approutes.dewpoint import dewpoint_route
 from approutes.hourly_rain import hourly_rain_route
+from approutes.humidity import humidity_route
 from approutes.outdoor_temperature import outdoor_temperature_route
 from approutes.relative_pressure import relative_pressure_route
 from approutes.wind_gust import wind_gust_route
@@ -28,6 +29,7 @@ relative_pressure_route(app)
 hourly_rain_route(app)
 daily_rain_route(app)
 yearly_rain_route(app)
+humidity_route(app)
 
 # Entry point
 if __name__ == '__main__':
