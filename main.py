@@ -1,9 +1,9 @@
 #Importing the libraries
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 
-from approutes.absolute_pressure import absolute_pressure_route
 # Importing the routes
+from approutes.absolute_pressure import absolute_pressure_route
 from approutes.all_weather import all_weather_route
 from approutes.daily_rain import daily_rain_route
 from approutes.dewpoint import dewpoint_route
@@ -30,6 +30,11 @@ hourly_rain_route(app)
 daily_rain_route(app)
 yearly_rain_route(app)
 humidity_route(app)
+
+#Error handling
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': '404 Not found', 'message': 'This route is not available. Please check your URL.'}), 404
 
 # Entry point
 if __name__ == '__main__':
