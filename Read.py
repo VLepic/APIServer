@@ -34,7 +34,7 @@ def read(url, token, org, bucket, entity_id, field_name, start_time, end_time):
 
 def read_latest(url: str, token: str, org: str, bucket: str, entity_id: str, field_name: str, sampling_period: str):
     client = InfluxDBClient(url=url, token=token, org=org)
-    query = f'from(bucket:"{bucket}") |> range(start: -{sampling_period}) |> filter(fn: (r) => r["entity_id"] == "{entity_id}") |> filter(fn: (r) => r["_field"] == "{field_name}") |> last()'
+    query = f'from(bucket:"{bucket}") |> range(start: {sampling_period}) |> filter(fn: (r) => r["entity_id"] == "{entity_id}") |> filter(fn: (r) => r["_field"] == "{field_name}") |> last()'
     # Query data
     try:
         tables = client.query_api().query(query=query)
