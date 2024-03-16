@@ -15,7 +15,7 @@ def daily_rain_route(app):
         INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
         org = "HA"
         bucket = "home_assistant"
-        entity_id_temperature = "gw1100a_v2_1_3_daily_rain_rate"
+        entity_id_temperature = "gw1100a_v2_2_3_daily_rain_rate"
         field = "value"
 
         # Retrieve start and stop time arguments from the request URL parameters
@@ -43,7 +43,7 @@ def latest_daily_rain_route(app):
         INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
         org = "HA"
         bucket = "home_assistant"
-        entity_id_temperature = "gw1100a_v2_1_3_daily_rain_rate"
+        entity_id_temperature = "gw1100a_v2_2_3_daily_rain_rate"
         field = "value"
 
         # Fetch data for temperature within the specified time range
