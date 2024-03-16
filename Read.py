@@ -60,5 +60,5 @@ def read_latest(url: str, token: str, org: str, bucket: str, entity_id: str, fie
     local_timezone = pytz.timezone(timezone)
 
     # Convert each UTC time to your local timezone
-    time_values_local = [time.replace(tzinfo=timezone.utc).astimezone(local_timezone) for time in time_values]
+    time_values_local = [time.astimezone(local_timezone) for time in time_values]
     return time_values_local, measurement_values
