@@ -36,7 +36,7 @@ def humidity_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_humidity_route(app):
-        @app.route('/latest_humidity', methods=['GET'])
+        @app.route('/latest/humidity', methods=['GET'])
         def get_latest_humidity():
             # InfluxDB connection details and measurement specifics
             INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

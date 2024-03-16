@@ -38,7 +38,7 @@ def dewpoint_route(app):
 
 def latest_dewpoint_route(app):
 
-    @app.route('/latest_dewpoint', methods=['GET'])
+    @app.route('/latest/dewpoint', methods=['GET'])
     def get_latest_dewpoint():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

@@ -36,7 +36,7 @@ def hourly_rain_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_hourly_rain_route(app):
-    @app.route('/latest_hourly_rain', methods=['GET'])
+    @app.route('/latest/hourly_rain', methods=['GET'])
     def get_latest_hourly_rain():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -47,7 +47,7 @@ def latest_hourly_rain_route(app):
         field = "value"
 
         # Fetch data for temperature within the specified time range
-        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, "-1h")
+        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, "-620h")
 
         # Convert datetime objects to ISO 8601 format
         time_values_iso = [time.isoformat() for time in time_values]

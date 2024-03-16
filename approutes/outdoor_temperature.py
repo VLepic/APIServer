@@ -36,7 +36,7 @@ def outdoor_temperature_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_outdoor_temperature_route(app):
-        @app.route('/latest_outdoor_temperature', methods=['GET'])
+        @app.route('/latest/outdoor_temperature', methods=['GET'])
         def get_latest_outdoor_temperature():
             # InfluxDB connection details and measurement specifics
             INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
