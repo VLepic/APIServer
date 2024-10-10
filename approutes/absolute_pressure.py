@@ -7,7 +7,7 @@ from flask import jsonify, request
 from Read import read, read_latest
 
 def absolute_pressure_route(app):
-    @app.route('/absolute_pressure', methods=['GET'])
+    @app.route('/weather/absolute_pressure', methods=['GET'])
     def get_absolute_pressure():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -35,7 +35,7 @@ def absolute_pressure_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_absolute_pressure_route(app):
-    @app.route('/latest/absolute_pressure', methods=['GET'])
+    @app.route('/weather/absolute_pressure/latest', methods=['GET'])
     def get_latest_absolute_pressure():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

@@ -9,7 +9,7 @@ from Read import read, read_latest
 
 def dewpoint_route(app):
 
-    @app.route('/dewpoint', methods=['GET'])
+    @app.route('/weather/dewpoint', methods=['GET'])
     def get_dewpoint():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -38,7 +38,7 @@ def dewpoint_route(app):
 
 def latest_dewpoint_route(app):
 
-    @app.route('/latest/dewpoint', methods=['GET'])
+    @app.route('/weather/dewpoint/latest', methods=['GET'])
     def get_latest_dewpoint():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

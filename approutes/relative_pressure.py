@@ -8,7 +8,7 @@ from Read import read, read_latest
 
 
 def relative_pressure_route(app):
-    @app.route('/relative_pressure', methods=['GET'])
+    @app.route('/weather/relative_pressure', methods=['GET'])
     def get_relative_pressure():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -35,7 +35,7 @@ def relative_pressure_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_relative_pressure_route(app):
-        @app.route('/latest/relative_pressure', methods=['GET'])
+        @app.route('/weather/relative_pressure/latest', methods=['GET'])
         def get_latest_relative_pressure():
             # InfluxDB connection details and measurement specifics
             INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

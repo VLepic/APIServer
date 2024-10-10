@@ -8,7 +8,7 @@ from Read import read, read_latest
 
 
 def wind_gust_route(app):
-    @app.route('/wind_gust', methods=['GET'])
+    @app.route('/weather/wind_gust', methods=['GET'])
     def get_wind_gust():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -36,7 +36,7 @@ def wind_gust_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_wind_gust_route(app):
-        @app.route('/latest/wind_gust', methods=['GET'])
+        @app.route('/weather/wind_gust/latest', methods=['GET'])
         def get_latest_wind_gust():
             # InfluxDB connection details and measurement specifics
             INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

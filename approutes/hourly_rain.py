@@ -8,7 +8,7 @@ from Read import read
 
 
 def hourly_rain_route(app):
-    @app.route('/hourly_rain', methods=['GET'])
+    @app.route('/weather/hourly_rain', methods=['GET'])
     def get_hourly_rain():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
@@ -36,7 +36,7 @@ def hourly_rain_route(app):
         return jsonify({'time_values': time_values_iso, 'measurement_values': measurement_values})
 
 def latest_hourly_rain_route(app):
-    @app.route('/latest/hourly_rain', methods=['GET'])
+    @app.route('/weather/hourly_rain/latest', methods=['GET'])
     def get_latest_hourly_rain():
         # InfluxDB connection details and measurement specifics
         INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')

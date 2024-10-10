@@ -4,7 +4,7 @@ import os
 from flask import jsonify, request
 from joblib import Parallel, delayed
 
-from Read import read
+from Read import read, read_latest
 
 
 def read_weather_data(entity_id, start_time, end_time):
@@ -25,7 +25,7 @@ def read_weather_data(entity_id, start_time, end_time):
     }
 
 def all_weather_route(app):
-    @app.route('/all_weather_data', methods=['GET'])
+    @app.route('/weather/all_weather_data', methods=['GET'])
     def get_all_weather_data():
         entity_ids = [
                       "gw1100a_v2_2_3_humidity",
@@ -51,4 +51,3 @@ def all_weather_route(app):
             grouped_results[entity_id] = result
 
         return jsonify(grouped_results)
-
