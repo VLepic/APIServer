@@ -1,5 +1,5 @@
 # Use Python slim base image
-FROM python:3.12-slim
+FROM python:3.11-slim
 RUN apt-get update
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,7 +22,8 @@ EXPOSE 5000
 COPY approutes /app/approutes
 
 # Run Gunicorn with 4 workers
-CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5000", "main:app"]
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "--bind", "0.0.0.0:5000", "main:app"]
+
 
 
 
