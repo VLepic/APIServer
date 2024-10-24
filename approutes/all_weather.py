@@ -3,7 +3,7 @@ import os
 
 from flask import jsonify, request
 from joblib import Parallel, delayed
-
+from datetime import datetime
 from Read import read, read_latest
 
 
@@ -43,7 +43,8 @@ def all_weather_route(app):
 
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
-
+        print(
+            f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for all weather data between {start_time} and {end_time}')
         results = Parallel(n_jobs=num_processes)(delayed(read_weather_data)(entity_id, start_time, end_time) for entity_id in entity_ids)
 
         grouped_results = {}

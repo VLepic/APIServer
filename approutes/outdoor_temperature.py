@@ -6,6 +6,7 @@ from flask import jsonify, request
 from flask_socketio import SocketIO
 import eventlet
 from Read import read, read_latest
+from datetime import datetime
 
 
 def outdoor_temperature_route(app):
@@ -23,7 +24,7 @@ def outdoor_temperature_route(app):
         # Retrieve start and stop time arguments from the request URL parameters
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
-        print(f"Received request for outdoor temperature data between {start_time} and {end_time}")
+        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for outdoor temperature data between {start_time} and {end_time}')
         # Check if start_time and end_time are provided in the request, otherwise return error message
         if not start_time or not end_time:
             return jsonify({'error': 'Please provide start_time and end_time parameters in the URL'})
@@ -39,7 +40,7 @@ def outdoor_temperature_route(app):
 def latest_outdoor_temperature_route(app):
         @app.route('/weather/outdoor_temperature/latest', methods=['GET'])
         def get_latest_outdoor_temperature():
-            print(f"Received request for latest outdoor temperature data")
+            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for latest outdoor temperature data')
             # InfluxDB connection details and measurement specifics
             INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
             INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')

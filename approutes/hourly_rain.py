@@ -3,7 +3,7 @@
 import os
 
 from flask import jsonify, request
-
+from datetime import datetime
 from Read import read
 
 
@@ -21,6 +21,7 @@ def hourly_rain_route(app):
         # Retrieve start and stop time arguments from the request URL parameters
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
+        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for hourly rain data between {start_time} and {end_time}')
 
         # Check if start_time and end_time are provided in the request, otherwise return error message
         if not start_time or not end_time:
@@ -45,6 +46,7 @@ def latest_hourly_rain_route(app):
         bucket = "home_assistant"
         entity_id_temperature = "gw1100a_v2_2_3_hourly_rain_rate"
         field = "value"
+        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for latest hourly rain data')
 
         # Fetch data for temperature within the specified time range
         time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, "-620h")

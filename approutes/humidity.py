@@ -1,7 +1,7 @@
 """Route for retrieving humidity data from InfluxDB"""
 
 import os
-
+from datetime import datetime
 from flask import jsonify, request
 
 from Read import read, read_latest
@@ -22,6 +22,7 @@ def humidity_route(app):
         # Retrieve start and stop time arguments from the request URL parameters
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
+        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for humidity data between {start_time} and {end_time}')
 
         # Check if start_time and end_time are provided in the request, otherwise return error message
         if not start_time or not end_time:
@@ -45,6 +46,7 @@ def latest_humidity_route(app):
             bucket = "home_assistant"
             entity_id_temperature = "gw1100a_v2_2_3_humidity"
             field = "value"
+            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for latest humidity data')
 
             # Fetch data for temperature within the specified time range
             time_values, measurement_values = read_latest(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id_temperature, field, "-1h")
