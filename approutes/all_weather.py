@@ -1,10 +1,9 @@
 """Route for all weather data"""
 import os
-
+import logging
 from flask import jsonify, request
 from joblib import Parallel, delayed
-from datetime import datetime
-from Read import read, read_latest
+from Read import read
 
 
 def read_weather_data(entity_id, start_time, end_time):
@@ -15,14 +14,18 @@ def read_weather_data(entity_id, start_time, end_time):
     field = "value"
 
     if not start_time or not end_time:
-        return {'error': 'Please provide start_time and end_time parameters in the URL'}
+        return {'error': 'Please provide start_time and end_time parameters in the URL'}, 400
+    try:
+        time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id, field, start_time, end_time)
+    except Exception as InfluxDBReadError:
+        logging.critical(f"Error fetching data for all weather: {InfluxDBReadError}")
+        return jsonify({'500 Server error': 'An error occurred while fetching data from InfluxDB'}), 500
 
-    time_values, measurement_values = read(INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id, field, start_time, end_time)
     time_values_iso = [time.isoformat() for time in time_values]
     return {
         'time_values': time_values_iso,
         'measurement_values': measurement_values
-    }
+    }, 200
 
 def all_weather_route(app):
     @app.route('/weather/all_weather_data', methods=['GET'])
@@ -43,12 +46,11 @@ def all_weather_route(app):
 
         start_time = request.args.get('start_time')
         end_time = request.args.get('end_time')
-        print(
-            f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Received request for all weather data between {start_time} and {end_time}')
+        logging.info(f'Received request for all weather data between {start_time} and {end_time}')
         results = Parallel(n_jobs=num_processes)(delayed(read_weather_data)(entity_id, start_time, end_time) for entity_id in entity_ids)
 
         grouped_results = {}
         for entity_id, result in zip(entity_ids, results):
             grouped_results[entity_id] = result
 
-        return jsonify(grouped_results)
+        return jsonify(grouped_results), 200

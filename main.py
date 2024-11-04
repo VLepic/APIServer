@@ -1,23 +1,14 @@
 # Importing the libraries
+import logging
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
 import eventlet
 from threading import Thread
 import os
-
 from joblib import Parallel, delayed
-
-from Read import read, read_latest
-import threading
-from flask_socketio import SocketIO
-import eventlet
-import os
+from Read import read, read_latest  # Assuming these functions are properly imported
 from datetime import datetime
-from flask import Flask
-from Read import read_latest  # Assuming this function is properly imported
-
-# Importing the routes and WebSocket updates
 from approutes.all_weather import all_weather_route
 from approutes.absolute_pressure import absolute_pressure_route, latest_absolute_pressure_route
 from approutes.daily_rain import daily_rain_route, latest_daily_rain_route
@@ -30,6 +21,17 @@ from approutes.wind_gust import wind_gust_route, latest_wind_gust_route
 from approutes.wind_speed import wind_speed_route, latest_wind_speed_route
 from approutes.yearly_rain import yearly_rain_route, latest_yearly_rain_route
 from approutes.rain_rate import rain_rate_route, latest_rain_rate_route
+import threading
+
+# Configure logging
+
+log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+numeric_level = getattr(logging, log_level, logging.INFO)
+logging.basicConfig(
+    level=numeric_level,
+    format='[%(asctime)s] %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 # Initialize Flask app
 eventlet.monkey_patch()
@@ -64,25 +66,20 @@ latest_humidity_route(app)
 rain_rate_route(app)
 latest_rain_rate_route(app)
 
-
 @socketio.on('connect')
 def handle_connect():
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Client connected')
-
+    logging.info(f'Client connected')
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Client {request.sid} disconnected')
+    logging.info(f'Client {request.sid} disconnected')
 
-    # Odeberte klienta ze všech měření, ke kterým byl přihlášen
+    # Remove client from all subscribed measurements
     with thread_lock:
         for measurement, client_set in clients.items():
             if request.sid in client_set:
                 client_set.remove(request.sid)
-                print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Client {request.sid} unsubscribed from {measurement}')
-
-
-import threading
+                logging.info(f'Client {request.sid} unsubscribed from {measurement}')
 
 clients = {
     "temperature": set(),
@@ -99,10 +96,9 @@ clients = {
 }
 thread_lock = threading.Lock()
 
-
 def weather_socket(socketio):
     """Function to send updates for specific measurements to subscribed clients."""
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running weather socket updates')
+    logging.info('Running weather socket updates')
     INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
     INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
     org = "HA"
@@ -129,13 +125,17 @@ def weather_socket(socketio):
                 continue
 
         for measurement, entity_id in entity_ids.items():
-            time_values, measurement_values = read_latest(
-                INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id, "value", "-30d"
-            )
+            try:
+                time_values, measurement_values = read_latest(
+                    INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id, "value", "-30d"
+                )
+            except Exception as e:
+                logging.critical(f'Error fetching latest data for {measurement}: {e}')
+                socketio.emit('error', {'message': f'Error fetching latest data for {measurement}'})
+                continue
             if time_values and measurement_values:
                 latest_time = time_values[0]
                 if last_times[measurement] is None or latest_time != last_times[measurement]:
-                    #print(f"New data for {measurement}: {measurement_values[0]} at {latest_time}")
                     data = {
                         'measurement': measurement,
                         'time_values': [latest_time.isoformat()],
@@ -146,14 +146,12 @@ def weather_socket(socketio):
                     # Emit data only to clients subscribed to this measurement
                     with thread_lock:
                         for client in clients[measurement]:
-                            print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Sending {measurement} update to client {client}')
+                            logging.info(f'Sending {measurement} update to client {client}')
                             socketio.emit(f'{measurement}_update', data, to=client)
 
-        eventlet.sleep(1)  # Opakovat každou sekundu
+        eventlet.sleep(1)  # Repeat every second
 
-
-
-# Správa připojení klientů
+# Manage client subscriptions
 @socketio.on('subscribe')
 def handle_subscribe(data):
     global clients
@@ -161,13 +159,15 @@ def handle_subscribe(data):
     if measurement in clients:
         with thread_lock:
             clients[measurement].add(request.sid)
-        print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Client {request.sid} subscribed to {measurement}')
-        # Pošleme okamžitě aktuální data po subscribe
-        send_initial_data(measurement, request.sid)
-
+        logging.info(f'Client {request.sid} subscribed to {measurement}')
+        # Send immediate data upon subscription
+        try:
+            send_initial_data(measurement, request.sid)
+        except KeyError as e:
+            logging.error(f'Error: {e} - The session {request.sid} is disconnected')
 
 def send_initial_data(measurement, sid):
-    print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Sending initial data to {sid}')
+    logging.info(f'Sending initial data to {sid}')
     """Send the initial data for a measurement after subscribing."""
     INFLUXDB_URL = os.environ.get('INFLUXDB_URL', 'default-influxdb-url')
     INFLUXDB_TOKEN = os.environ.get('INFLUXDB_TOKEN', 'default-influxdb-token')
@@ -190,9 +190,14 @@ def send_initial_data(measurement, sid):
 
     entity_id = entity_ids.get(measurement)
     if entity_id:
-        time_values, measurement_values = read_latest(
+        try:
+            time_values, measurement_values = read_latest(
             INFLUXDB_URL, INFLUXDB_TOKEN, org, bucket, entity_id, "value", "-30d"
         )
+        except Exception as e:
+            logging.critical(f'Error fetching initial data for {measurement}: {e}')
+            socketio.emit('error', {'message': f'Error fetching initial data for {measurement}'})
+            return
         if time_values and measurement_values:
             data = {
                 'measurement': measurement,
@@ -201,23 +206,21 @@ def send_initial_data(measurement, sid):
             }
             socketio.emit(f'{measurement}_update', data, to=sid)
 
-
 # Error handling
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': '404 Not found', 'message': 'This route is not available. Please check your URL.'}), 404
 
-print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Starting weather socket thread...')
-
+logging.info('Starting weather socket thread...')
 eventlet.spawn(weather_socket, socketio)
-
-print(f'[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Weather socket thread started.')
+logging.info('Weather socket thread started.')
 
 # Entry point
 if __name__ == '__main__':
-    print('[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Starting Flask app with SocketIO...')
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
-    print('[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Flask app started')
+    logging.info('Starting Flask app with SocketIO...')
+    socketio.run(app, debug=False, host='0.0.0.0', port=5000, ping_timeout=20, ping_interval=5)
+    logging.info('Flask app started')
+
 
 
 
