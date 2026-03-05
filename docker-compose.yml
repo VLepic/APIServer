@@ -1,0 +1,26 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: weather-api:local
+    container_name: weather-api-local
+    ports:
+      - "5000:5000"
+    environment:
+      INFLUXDB_URL: ${INFLUXDB_URL}
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN}
+      INFLUXDB_ORG: ${INFLUXDB_ORG:-HA}
+      INFLUXDB_BUCKET: ${INFLUXDB_BUCKET:-home_assistant}
+      TIMEZONE: ${TIMEZONE:-UTC}
+    restart: unless-stopped
+
+  api-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: weather-api:local
+    profiles: ["test"]
+    command: ["python", "-m", "unittest", "discover", "-v", "-s", "tests"]
+    environment:
+      TIMEZONE: ${TIMEZONE:-UTC}
